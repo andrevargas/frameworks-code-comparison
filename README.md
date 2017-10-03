@@ -635,14 +635,13 @@ class BookList extends React.Component {
 ### Angular
 
 ### React
+In React, we have two options to deal with child nodes: [`refs`](https://reactjs.org/docs/refs-and-the-dom) and [`children`](https://reactjs.org/docs/jsx-in-depth.html#children-in-jsx). With `refs`, you have access to the _real_ DOM element. The `children` property let you manipulate the underlying [React elements](https://reactjs.org/blog/2015/12/18/react-components-elements-and-instances.html).
 
+#### refs
+`ref` is a special attribute we can pass to a React element that receives a callback and call it with the corresponding DOM node.
 ```jsx
-// In React, we can use the `ref` attribute to have access to the DOM.
-// https://reactjs.org/docs/refs-and-the-dom
-
-// The `ref` attribute takes a callback and call it with the correspondig DOM element.
-// In order to access child nodes from parents, we can pass the `ref` callback to
-// the children as props.
+// In order to access child nodes from parents, we can pass the `ref` callback
+// to the children as props.
 const TextInput = ({ inputRef }) => (
   <div>
     <input ref={inputRef} type="text" />
@@ -671,6 +670,41 @@ class Parent extends React.Component {
   }
 }
 
+```
+
+#### children
+`children` is a special prop avaliable in all React component instances. You can use it to control _how_ and _where_ the underlying React elements will be rendered.
+
+```jsx
+// children is just a prop. In this case, the value of `children` will be
+// what you pass to the <Heading /> component as a child node.
+const Heading = ({ children }) => (
+  <h1 className="Heading">
+    {children}
+  </h1>
+);
+
+// `this.props.children` refers to whatever is a valid node inside the <Layout /> element.
+class Layout extends React.Component {
+  render() {
+    return (
+      <div class="Layout">
+        {this.props.children}
+      </div>
+    );
+  }
+}
+
+const App = () => (
+  <div>
+    <Heading>I am the child!</Heading>
+    <Layout>
+      We are
+      {'the'}
+      <strong>Children!</strong>
+    </Layout>
+  </div>
+);
 ```
 
 # Transclusion / Containment
