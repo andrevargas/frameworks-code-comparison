@@ -630,6 +630,49 @@ class BookList extends React.Component {
 > ViewChild vs refs
 > ContentChild vs this.props.children
 
+### AngularJS
+
+### Angular
+
+### React
+
+```jsx
+// In React, we can use the `ref` attribute to have access to the DOM.
+// https://reactjs.org/docs/refs-and-the-dom
+
+// The `ref` attribute takes a callback and call it with the correspondig DOM element.
+// In order to access child nodes from parents, we can pass the `ref` callback to
+// the children as props.
+const TextInput = ({ inputRef }) => (
+  <div>
+    <input ref={inputRef} type="text" />
+  </div>
+);
+
+class Parent extends React.Component {
+
+  componentDidMount() {
+    // Refs are only executed after mounting and unmounting. Now `this.textInput`
+    // references a real DOM node. So, we can use the raw DOM API
+    // (to focus the input, for example)
+    this.textInput.focus();
+  }
+
+  render() {
+    // The child's `inputRef` prop receives the `ref` callback.
+    // We can use the callback to store the DOM element in an instance variable.
+    return (
+      <div>
+        <label>This is my child: </label>
+        <TextInput
+          inputRef={node => { this.textInput = node; }} />
+      </div>
+    )
+  }
+}
+
+```
+
 # Transclusion / Containment
 
 ## Basic
