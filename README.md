@@ -631,6 +631,36 @@ class BookList extends React.Component {
 > ContentChild vs this.props.children
 
 ### AngularJS
+In an [AngularJS component](https://docs.angularjs.org/guide/component), we have access to the child node by injecting [`$element`](https://docs.angularjs.org/api/ng/function/angular.element) to its controller.
+```js
+class TextInputCtrl {
+  constructor($scope, $element) {
+    // $element is passed to the constructor and stored in an instance variable.
+    this.$scope = $scope;
+    this.$element = $element;
+  }
+  
+  $postLink() {
+    // When the links are done, we can use the $element attribute.
+    // It has a jqLite wrapped instance of the DOM element,
+    // so we have access to some jQuery methods.
+    const input = this.$element.find('input');
+    input.on('change', console.log);
+  }
+}
+
+const component = {
+  controller: TextInputCtrl
+  template: `
+    <div>
+      <input type="text" />
+    </div>
+  `
+};
+
+angular.module('app', [])
+  .component('textInput', component);
+```
 
 ### Angular
 
