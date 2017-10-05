@@ -28,6 +28,7 @@ Angular code is written in TypeScript.
   * [Handling Events](#handling-events)
   * [Lifecycle methods](#lifecycle-methods)
   * [Lists](#lists)
+  * [Child nodes](#child-nodes)
 
 
 # Simple component
@@ -626,10 +627,6 @@ class BookList extends React.Component {
 
 # Child nodes
 
-> TODO
-> ViewChild vs refs
-> ContentChild vs this.props.children
-
 ### AngularJS
 In an [AngularJS component](https://docs.angularjs.org/guide/component), we have access to the child node by injecting [`$element`](https://docs.angularjs.org/api/ng/function/angular.element) to its controller.
 ```js
@@ -663,6 +660,78 @@ angular.module('app', [])
 ```
 
 ### Angular
+Angular provides two ways to deal with child nodes: `ViewChild(ren)` and `ContentChild(ren)`. They both have the same purpose, but there are different use cases for them.
+
+#### ViewChild
+[`ViewChild`](https://angular.io/api/core/ViewChild) returns the specified element from the view DOM. [`ViewChildren`](https://angular.io/api/core/ViewChildren) does the same, but for multiple elements (returning as a `QueryList`).
+```ts
+import {
+  Component,
+  Directive,
+  ViewChild,
+  AfterViewInit
+} from '@angular/core';
+
+@Directive({ selector: 'child' })
+export class Child {}
+
+@Component({
+  selector: 'parent',
+  template: '<child></child>'
+})
+export class Parent implements AfterViewInit {
+  // We use the @ViewChild decorator to get the <child> directive
+  @ViewChild(Child) viewChild: Child;
+  
+  ngAfterViewInit() {
+    // The element is only avaliable when the ngAfterViewInit lifecycle hook is reached.
+    console.log(this.viewChild);
+  }
+}
+```
+
+#### ContentChild
+`ViewChild` **don't** include elements that exists within the `ng-content` tag. So we have [`ContentChild`](https://angular.io/api/core/ContentChild), that **only** includes elements that exists within the `<ng-content>` tag. [`ContentChildren`](https://angular.io/api/core/ContentChildren) does the same, but for multiple elements (also returning a `QueryList`).
+
+```ts
+import {
+  Component,
+  Directive,
+  ContentChild,
+  AfterContentInit
+} from '@angular/core';
+
+@Directive({ selector: 'child' })
+export class Child {}
+
+@Component({
+  selector: 'parent',
+  template: '<ng-content></ng-content>'
+})
+export class Parent implements AfterContentInit {
+  // We use the @ContentChild decorator to get
+  // the elements that exists within the <ng-content> tag
+  @ContentChild(Child) contentChild: Child;
+  
+  ngAfterContentInit() {
+    // The element is only avaliable when the ngAfterContentInit lifecycle hook is reached.
+    console.log(this.contentChild);
+  }
+}
+
+@Component({
+  selector: 'app',
+  template: `
+    <parent>
+      <child></child>
+    </parent>
+  `
+})
+export class AppComponent {
+  // In this component's template, the <child> element inside the <parent> element
+  // corresponds to the content that exists whitin the <ng-content> tag.
+}
+```
 
 ### React
 In React, we have two options to deal with child nodes: [`refs`](https://reactjs.org/docs/refs-and-the-dom) and [`children`](https://reactjs.org/docs/jsx-in-depth.html#children-in-jsx). With `refs`, you have access to the _real_ DOM element. The `children` property let you manipulate the underlying [React elements](https://reactjs.org/blog/2015/12/18/react-components-elements-and-instances.html).
