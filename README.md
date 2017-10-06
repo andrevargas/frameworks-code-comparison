@@ -628,26 +628,24 @@ class BookList extends React.Component {
 # Child nodes
 
 ### AngularJS
-In an [AngularJS component](https://docs.angularjs.org/guide/component), we have access to the child node by injecting [`$element`](https://docs.angularjs.org/api/ng/function/angular.element) to its controller.
+In an [AngularJS component](https://docs.angularjs.org/guide/component), we have access to the child node by injecting [`$element`](https://docs.angularjs.org/api/ng/function/angular.element) to its controller. It has a jqLite wrapped instance of the DOM element, so we have access to some jQuery methods. Also, accessing `$element[0]` will return the bare DOM element.
 ```js
-class TextInputCtrl {
+class TextInputController {
   constructor($scope, $element) {
-    // $element is passed to the constructor and stored in an instance variable.
+    'ngInject';
     this.$scope = $scope;
     this.$element = $element;
   }
   
   $postLink() {
     // When the links are done, we can use the $element attribute.
-    // It has a jqLite wrapped instance of the DOM element,
-    // so we have access to some jQuery methods.
     const input = this.$element.find('input');
     input.on('change', console.log);
   }
 }
 
 const component = {
-  controller: TextInputCtrl
+  controller: TextInputController
   template: `
     <div>
       <input type="text" />
@@ -667,12 +665,14 @@ Angular provides two ways to deal with child nodes: `ViewChild(ren)` and `Conten
 ```ts
 import {
   Component,
-  Directive,
   ViewChild,
   AfterViewInit
 } from '@angular/core';
 
-@Directive({ selector: 'child' })
+@Component({
+  selector: 'child',
+  template: '<p>This is the child template.</p>'
+})
 export class Child {}
 
 @Component({
