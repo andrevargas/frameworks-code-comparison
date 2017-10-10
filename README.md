@@ -660,61 +660,50 @@ angular.module('app', [])
 ### Angular
 Angular provides two ways to deal with child nodes: `ViewChild(ren)` and `ContentChild(ren)`. They both have the same purpose, but there are different use cases for them.
 
-#### ViewChild
-[`ViewChild`](https://angular.io/api/core/ViewChild) returns the specified element from the view DOM. [`ViewChildren`](https://angular.io/api/core/ViewChildren) does the same, but for multiple elements (returning as a `QueryList`).
+[`ViewChild`](https://angular.io/api/core/ViewChild) works with the **internal DOM of your component**, defined by you in the `template` or `templateUrl` metadata. Use the `@ViewChild` decorator to get your own DOM elements.
+
+[`ContentChild`](https://angular.io/api/core/ContentChild) works with de **DOM supplied to your component by its end-user**. See [Transclusion and Containment](#transclusion-and-containment). User the `@ContentChild` decorator to get the DOM elements supplied to your component.
+
 ```ts
 import {
   Component,
+  Input,
   ViewChild,
-  AfterViewInit
+  ContentChild,
+  AfterViewInit,
+  AfterContentInit
 } from '@angular/core';
 
 @Component({
   selector: 'child',
-  template: '<p>This is the child template.</p>'
+  template: `
+    <p>Hello, I'm your child #{{ number }}!</p>
+  `
 })
-export class Child {}
+export class Child {
+  @Input() number: number;
+}
 
 @Component({
   selector: 'parent',
-  template: '<child></child>'
+  template: `
+    <child number="1"></child>
+    <ng-content></ng-content>
+  `
 })
-export class Parent implements AfterViewInit {
-  // We use the @ViewChild decorator to get the <child> directive
+export class Parent implements AfterViewInit, AfterContentInit {
   @ViewChild(Child) viewChild: Child;
-  
+  @ContentChild(Child) contentChild: Child;
+
   ngAfterViewInit() {
-    // The element is only avaliable when the ngAfterViewInit lifecycle hook is reached.
+    // ViewChild element is only avaliable when the
+    // ngAfterViewInit lifecycle hook is reached.
     console.log(this.viewChild);
   }
-}
-```
 
-#### ContentChild
-`ViewChild` **don't** include elements that exists within the `ng-content` tag. So we have [`ContentChild`](https://angular.io/api/core/ContentChild), that **only** includes elements that exists within the `<ng-content>` tag. [`ContentChildren`](https://angular.io/api/core/ContentChildren) does the same, but for multiple elements (also returning a `QueryList`).
-
-```ts
-import {
-  Component,
-  Directive,
-  ContentChild,
-  AfterContentInit
-} from '@angular/core';
-
-@Directive({ selector: 'child' })
-export class Child {}
-
-@Component({
-  selector: 'parent',
-  template: '<ng-content></ng-content>'
-})
-export class Parent implements AfterContentInit {
-  // We use the @ContentChild decorator to get
-  // the elements that exists within the <ng-content> tag
-  @ContentChild(Child) contentChild: Child;
-  
   ngAfterContentInit() {
-    // The element is only avaliable when the ngAfterContentInit lifecycle hook is reached.
+    // ContentChild element is only avaliable when the
+    // ngAfterContentInit lifecycle hook is reached.
     console.log(this.contentChild);
   }
 }
@@ -723,15 +712,16 @@ export class Parent implements AfterContentInit {
   selector: 'app',
   template: `
     <parent>
-      <child></child>
+      <child number="2"></child>
+      <child number="3"></child>
     </parent>
   `
 })
-export class AppComponent {
-  // In this component's template, the <child> element inside the <parent> element
-  // corresponds to the content that exists whitin the <ng-content> tag.
-}
+export class AppComponent { }
+
 ```
+
+`ViewChild` and `ContentChild` work with **only one** DOM element. You may use [`ViewChildren`](https://angular.io/api/core/ViewChildren) and [`ContentChildren`](https://angular.io/api/core/ContentChildren) in order to get **multiple elements**. Both return the elements wrapped in a [`QueryList`](https://angular.io/api/core/QueryList).
 
 ### React
 In React, we have two options to deal with child nodes: [`refs`](https://reactjs.org/docs/refs-and-the-dom) and [`children`](https://reactjs.org/docs/jsx-in-depth.html#children-in-jsx). With `refs`, you have access to the _real_ DOM element. The `children` property let you manipulate the underlying [React elements](https://reactjs.org/blog/2015/12/18/react-components-elements-and-instances.html).
